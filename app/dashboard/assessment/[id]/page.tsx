@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Clock, ChevronLeft, ChevronRight, AlertCircle, BookOpen, Loader2 } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight, AlertCircle, BookOpen, Loader2, Target, BrainCircuit, CheckCircle2 } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
-import { BLOOM_LABELS, BLOOM_COLORS } from '@/lib/bloom';
+import { BLOOM_LABELS } from '@/lib/bloom';
 import type { BloomLevel, Difficulty } from '@/types';
 
 interface SafeQuestion {
@@ -30,12 +30,6 @@ interface SafeAssessment {
 }
 
 type SubmitState = 'idle' | 'confirm' | 'submitting' | 'done';
-
-const DIFFICULTY_COLORS: Record<Difficulty, string> = {
-  easy: 'badge-green',
-  medium: 'badge-amber',
-  hard: 'badge-red',
-};
 
 export default function QuizPage() {
   const router = useRouter();
@@ -132,19 +126,27 @@ export default function QuizPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
-        <p className="text-slate-500 text-sm">Loading assessment...</p>
+      <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
+         <div className="flex flex-col items-center animate-pulse">
+            <div className="w-16 h-16 bg-[#Edf5f0] rounded-full flex items-center justify-center mb-4">
+               <svg className="animate-spin w-8 h-8 text-[#0A3D2C]" viewBox="0 0 50 50">
+                  <circle cx="25" cy="25" r="23" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray="100" strokeDashoffset="25" />
+               </svg>
+            </div>
+            <p className="text-slate-500 font-bold">Loading Assessment...</p>
+         </div>
       </div>
     );
   }
 
   if (error || !assessment) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <AlertCircle className="w-10 h-10 text-red-400" />
-        <p className="text-slate-700 font-medium">{error || 'Assessment not found'}</p>
-        <button onClick={() => router.push('/dashboard')} className="btn-secondary">
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] gap-6">
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-red-500">
+           <AlertCircle className="w-10 h-10" />
+        </div>
+        <p className="text-xl font-bold text-slate-900">{error || 'Assessment not found'}</p>
+        <button onClick={() => router.push('/dashboard')} className="px-6 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:text-slate-900 transition-colors">
           Back to Dashboard
         </button>
       </div>
@@ -154,81 +156,83 @@ export default function QuizPage() {
   const question = assessment.questions[currentIndex];
   const answeredCount = Object.keys(answers).length;
   const unansweredCount = assessment.questionCount - answeredCount;
-  const bloomColors = BLOOM_COLORS[question.bloomLevel];
   const isLowTime = timeLeft < 60 && timeLeft > 0;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="animate-fade-in w-full max-w-6xl mx-auto py-8 px-4 sm:px-8 flex flex-col min-h-[calc(100vh-80px)]">
+      
       {/* ─── Header ─── */}
-      <div className="flex items-center justify-between mb-6 gap-4">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="min-w-0">
-          <h1 className="text-lg font-bold text-slate-900 truncate">{assessment.title}</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Question {currentIndex + 1} of {assessment.questionCount}
+          <h1 className="text-3xl font-bold text-[#1a2b25] tracking-tight mb-2 truncate">
+            {assessment.title}
+          </h1>
+          <p className="text-[15px] font-medium text-slate-500 flex items-center gap-2">
+            Question <span className="font-bold text-[#0A3D2C]">{currentIndex + 1}</span> of {assessment.questionCount}
           </p>
-        </div>
-        <div
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg border font-mono text-base font-semibold flex-shrink-0 ${
-            submitState === 'submitting' || submitState === 'done'
-              ? 'bg-slate-100 border-slate-200 text-slate-400'
-              : isLowTime
-              ? 'bg-red-50 border-red-200 text-red-700 animate-pulse'
-              : 'bg-white border-slate-200 text-slate-700'
-          }`}
-        >
-          <Clock className="w-4 h-4" />
-          {formatTime(timeLeft)}
         </div>
       </div>
 
-      <div className="flex gap-5">
-        {/* ─── Question panel ─── */}
-        <div className="flex-1 min-w-0">
-          <div className="card p-6 mb-4">
-            {/* Question metadata */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              <span className={`badge ${bloomColors.bg} ${bloomColors.text} ${bloomColors.border}`}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 lg:gap-12 flex-1 items-start">
+        
+        {/* ─── Question Panel (Left Column) ─── */}
+        <div className="flex flex-col min-w-0">
+          
+          <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-8 md:p-12 mb-8 relative overflow-hidden">
+            {/* Background Accent */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#Edf5f0] to-transparent opacity-50 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+            {/* Question Metadata */}
+            <div className="flex flex-wrap items-center gap-3 mb-8 relative z-10">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50 border border-indigo-100 text-[11px] font-bold text-indigo-700 uppercase tracking-wider">
+                <BrainCircuit className="w-3.5 h-3.5" />
                 {BLOOM_LABELS[question.bloomLevel]}
               </span>
-              <span className={DIFFICULTY_COLORS[question.difficulty]}>
-                {question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
+              <span className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[11px] font-bold uppercase tracking-wider ${
+                question.difficulty === 'easy' ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+                question.difficulty === 'medium' ? 'bg-amber-50 border-amber-100 text-amber-700' :
+                'bg-red-50 border-red-100 text-red-700'
+              }`}>
+                <Target className="w-3.5 h-3.5" />
+                {question.difficulty}
               </span>
-              <span className="badge-slate flex items-center gap-1">
-                <BookOpen className="w-3 h-3" />
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-[11px] font-bold text-slate-600">
+                <BookOpen className="w-3.5 h-3.5" />
                 {question.topic}
               </span>
             </div>
 
-            {/* Question text */}
-            <p className="text-base font-medium text-slate-900 leading-relaxed mb-6 whitespace-pre-wrap">
+            {/* Question Text */}
+            <h2 className="text-xl md:text-[22px] font-bold text-[#1a2b25] leading-relaxed mb-10 whitespace-pre-wrap relative z-10">
               {question.question}
-            </p>
+            </h2>
 
             {/* Options */}
-            <div className="space-y-2.5">
+            <div className="space-y-4 relative z-10">
               {question.options.map((opt, i) => {
                 const isSelected = answers[question.id] === opt;
                 const label = String.fromCharCode(65 + i); // A, B, C, D
+                
                 return (
                   <button
                     key={i}
                     onClick={() => setAnswers((prev) => ({ ...prev, [question.id]: opt }))}
-                    className={`w-full flex items-start gap-3 p-4 rounded-lg border-2 text-left transition-all ${
-                      isSelected
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                    }`}
+                    className={`w-full flex items-start gap-4 p-5 rounded-2xl border-2 text-left transition-all group outline-none focus:ring-4 focus:ring-[#Edf5f0]
+                      ${isSelected
+                        ? 'border-[#0A3D2C] bg-[#F4F9F6] shadow-sm'
+                        : 'border-slate-100 bg-white hover:border-[#c1e2d1] hover:bg-[#F9FCFA] hover:shadow-sm'
+                      }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold transition-colors ${
-                        isSelected
-                          ? 'border-green-500 bg-green-500 text-white'
-                          : 'border-slate-300 text-slate-400'
-                      }`}
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-bold transition-all shadow-sm
+                        ${isSelected
+                          ? 'bg-[#0A3D2C] text-white'
+                          : 'bg-white border border-slate-200 text-slate-400 group-hover:border-[#c1e2d1] group-hover:text-[#0A3D2C]'
+                        }`}
                     >
                       {label}
                     </div>
-                    <span className={`text-sm leading-relaxed ${isSelected ? 'text-green-900' : 'text-slate-700'}`}>
+                    <span className={`text-[15px] leading-relaxed font-medium mt-1 ${isSelected ? 'text-[#0A3D2C] font-bold' : 'text-slate-600 group-hover:text-slate-800'}`}>
                       {opt}
                     </span>
                   </button>
@@ -237,89 +241,119 @@ export default function QuizPage() {
             </div>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation Buttons */}
           <div className="flex items-center justify-between">
             <button
               onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
               disabled={currentIndex === 0}
-              className="btn-secondary"
+              className="px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-slate-500 hover:text-slate-900 hover:bg-slate-50"
             >
               <ChevronLeft className="w-4 h-4" />
-              Previous
+              Previous Question
             </button>
 
             {currentIndex < assessment.questionCount - 1 ? (
               <button
                 onClick={() => setCurrentIndex((i) => Math.min(assessment.questionCount - 1, i + 1))}
-                className="btn-primary"
+                className="bg-[#0A3D2C] text-white hover:bg-[#06281c] px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-sm flex items-center gap-2 hover:shadow-md transform hover:-translate-y-0.5"
               >
-                Next
+                Next Question
                 <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <button
                 onClick={() => setSubmitState('confirm')}
-                className="btn-primary"
                 disabled={submitState !== 'idle'}
+                className="bg-[#0A3D2C] text-white hover:bg-[#06281c] px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-sm flex items-center gap-2 hover:shadow-md transform hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
               >
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 Submit Assessment
               </button>
             )}
           </div>
         </div>
 
-        {/* ─── Question navigator ─── */}
-        <div className="w-44 flex-shrink-0">
-          <div className="card p-4 sticky top-8">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
-              Questions
-            </p>
-            <div className="grid grid-cols-5 gap-1.5 mb-4">
+        {/* ─── Navigator Panel (Right Column) ─── */}
+        <div className="sticky top-8 flex flex-col gap-6 w-full">
+          
+          {/* Timer Card */}
+          <div className={`rounded-2xl border flex items-center justify-center gap-3 py-4 px-6 shadow-sm transition-colors ${
+              submitState === 'submitting' || submitState === 'done'
+                ? 'bg-slate-50 border-slate-200 text-slate-400'
+                : isLowTime
+                ? 'bg-red-50 border-red-200 text-red-600 animate-pulse'
+                : 'bg-white border-slate-100 text-[#0A3D2C]'
+            }`}
+          >
+            <Clock className={`w-5 h-5 ${isLowTime ? 'text-red-500' : 'text-[#0A3D2C]'}`} />
+            <span className="font-mono text-xl font-bold tracking-tight">
+              {formatTime(timeLeft)}
+            </span>
+          </div>
+
+          {/* Question Navigator Card */}
+          <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-6 flex flex-col">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6">
+              Question Navigator
+            </h3>
+            
+            <div className="grid grid-cols-5 gap-2 mb-8">
               {assessment.questions.map((q, i) => {
                 const isAnswered = !!answers[q.id];
                 const isCurrent = i === currentIndex;
+                
                 return (
                   <button
                     key={q.id}
                     onClick={() => setCurrentIndex(i)}
                     title={isAnswered ? 'Answered' : 'Unanswered'}
-                    className={`w-8 h-8 rounded text-xs font-semibold transition-colors ${
-                      isCurrent
-                        ? 'bg-green-600 text-white'
+                    className={`aspect-square rounded-xl text-sm font-bold transition-all flex items-center justify-center relative
+                      ${isCurrent
+                        ? 'bg-[#0A3D2C] text-white shadow-md transform -translate-y-0.5'
                         : isAnswered
-                        ? 'bg-green-100 text-green-700 border border-green-200'
-                        : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
-                    }`}
+                        ? 'bg-[#Edf5f0] text-[#0A3D2C] border border-[#c1e2d1] hover:border-[#0A3D2C]/40 hover:bg-[#F4F9F6]'
+                        : 'bg-white border border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600 hover:bg-slate-50'
+                      }`}
                   >
                     {i + 1}
+                    {isAnswered && !isCurrent && (
+                       <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                    )}
                   </button>
                 );
               })}
             </div>
 
-            <div className="space-y-1.5 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-green-600" />
-                <span className="text-slate-500">Current</span>
+            {/* Legend */}
+            <div className="space-y-3 p-4 rounded-xl bg-slate-50 border border-slate-100 mb-6">
+              <div className="flex items-center justify-between text-[13px]">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#0A3D2C]" />
+                  <span className="font-semibold text-slate-700">Current</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-green-100 border border-green-200" />
-                <span className="text-slate-500">Answered ({answeredCount})</span>
+              <div className="flex items-center justify-between text-[13px]">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#Edf5f0] border border-[#c1e2d1]" />
+                  <span className="font-semibold text-slate-700">Answered</span>
+                </div>
+                <span className="font-bold text-[#0A3D2C]">{answeredCount}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-slate-100" />
-                <span className="text-slate-500">Unanswered ({unansweredCount})</span>
+              <div className="flex items-center justify-between text-[13px]">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-white border border-slate-200" />
+                  <span className="font-semibold text-slate-700">Unanswered</span>
+                </div>
+                <span className="font-bold text-slate-500">{unansweredCount}</span>
               </div>
             </div>
-
-            <div className="divider my-3" />
 
             <button
               onClick={() => setSubmitState('confirm')}
               disabled={submitState !== 'idle'}
-              className="btn-primary w-full text-xs py-2"
+              className="w-full bg-[#Edf5f0] hover:bg-[#c1e2d1] text-[#0A3D2C] py-3.5 rounded-xl font-bold text-sm transition-colors border border-[#c1e2d1] disabled:opacity-50"
             >
-              Submit
+              Submit Assessment
             </button>
           </div>
         </div>
@@ -327,49 +361,63 @@ export default function QuizPage() {
 
       {/* ─── Submit confirmation modal ─── */}
       {(submitState === 'confirm' || submitState === 'submitting') && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="card p-6 w-full max-w-sm animate-slide-up">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-[32px] p-8 w-full max-w-md animate-slide-up shadow-2xl border border-slate-100">
             {submitState === 'submitting' ? (
-              <div className="text-center py-4">
-                <Loader2 className="w-8 h-8 text-green-600 animate-spin mx-auto mb-3" />
-                <p className="font-medium text-slate-900">Submitting assessment...</p>
-                <p className="text-sm text-slate-400 mt-1">Calculating your score</p>
+              <div className="text-center py-8 flex flex-col items-center">
+                <div className="w-20 h-20 bg-[#Edf5f0] rounded-full flex items-center justify-center mb-6 relative">
+                  <CheckCircle2 className="w-8 h-8 text-[#0A3D2C] absolute" />
+                  <svg className="animate-spin w-full h-full text-[#0A3D2C] opacity-20" viewBox="0 0 50 50">
+                    <circle cx="25" cy="25" r="23" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="100" strokeDashoffset="25" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Submitting assessment...</h3>
+                <p className="text-sm font-medium text-slate-500">Calculating your final score</p>
               </div>
             ) : (
               <>
-                <h3 className="text-lg font-bold text-slate-900 mb-1">Submit Assessment?</h3>
-                <p className="text-sm text-slate-500 mb-5">
-                  Once submitted, you cannot change your answers.
+                <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-500 mb-6 mx-auto">
+                   <AlertCircle className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-center text-[#1a2b25] mb-2">Ready to submit?</h3>
+                <p className="text-center text-sm font-medium text-slate-500 mb-8">
+                  Once submitted, you cannot change your answers. Please review your progress before continuing.
                 </p>
-                <div className="grid grid-cols-3 gap-3 mb-5">
-                  <div className="text-center p-3 rounded-lg bg-green-50">
-                    <p className="text-xl font-bold text-green-700">{answeredCount}</p>
-                    <p className="text-xs text-green-600 mt-0.5">Answered</p>
+                
+                <div className="grid grid-cols-3 gap-3 mb-8">
+                  <div className="text-center p-4 rounded-2xl bg-[#Edf5f0] border border-[#c1e2d1]">
+                    <p className="text-2xl font-bold text-[#0A3D2C] mb-1">{answeredCount}</p>
+                    <p className="text-[10px] font-bold text-[#0A3D2C]/70 uppercase tracking-wider">Answered</p>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-amber-50">
-                    <p className="text-xl font-bold text-amber-700">{unansweredCount}</p>
-                    <p className="text-xs text-amber-600 mt-0.5">Unanswered</p>
+                  <div className={`text-center p-4 rounded-2xl border ${unansweredCount > 0 ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                    <p className="text-2xl font-bold mb-1">{unansweredCount}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">Unanswered</p>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-slate-50">
-                    <p className="text-xl font-bold text-slate-700">{formatTime(timeLeft)}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">Remaining</p>
+                  <div className="text-center p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+                    <p className="text-xl font-bold text-indigo-700 mb-1 leading-8">{formatTime(timeLeft)}</p>
+                    <p className="text-[10px] font-bold text-indigo-700/70 uppercase tracking-wider">Remaining</p>
                   </div>
                 </div>
+                
                 {submitError && (
-                  <p className="text-sm text-red-600 mb-4">{submitError}</p>
+                  <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-700 mb-6">
+                    <div className="w-5 h-5 mt-0.5 shrink-0 bg-red-100 rounded-full flex items-center justify-center font-bold">!</div>
+                    <p className="text-sm font-bold">{submitError}</p>
+                  </div>
                 )}
-                <div className="flex gap-3">
+                
+                <div className="flex gap-4">
                   <button
                     onClick={() => setSubmitState('idle')}
-                    className="btn-secondary flex-1"
+                    className="flex-1 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors"
                   >
-                    Continue
+                    Cancel
                   </button>
                   <button
                     onClick={() => handleSubmit(false)}
-                    className="btn-primary flex-1"
+                    className="flex-1 bg-[#0A3D2C] text-white hover:bg-[#06281c] py-3.5 rounded-xl font-bold transition-colors shadow-sm"
                   >
-                    Submit
+                    Submit Now
                   </button>
                 </div>
               </>

@@ -2,6 +2,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import {
@@ -15,6 +16,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Sprout
 } from 'lucide-react';
 
 interface NavItem {
@@ -49,58 +51,73 @@ export default function DashboardSidebar({ userName, userEmail }: Props) {
   return (
     <aside className="w-60 bg-white border-r border-slate-200 h-screen sticky top-0 flex flex-col overflow-y-auto">
       {/* Logo */}
-      <div className="h-16 flex items-center gap-2 px-5 border-b border-slate-100 flex-shrink-0">
-        <div className="w-7 h-7 bg-green-600 rounded-lg flex items-center justify-center">
-          <BookOpen className="w-3.5 h-3.5 text-white" />
-        </div>
-        <span className="font-bold text-slate-900 text-[15px] tracking-tight">Assessora</span>
-      </div>
+      <Link href="/" className="h-16 flex items-center px-5 border-b border-slate-100 flex-shrink-0">
+        <Image src="/logo.png" alt="Assessora" width={120} height={30} className="object-contain" />
+      </Link>
 
       {/* Navigation */}
-      <nav className="flex-1 py-5 px-3 space-y-0.5">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.href);
-
-          if (item.phase2) {
+      <nav className="flex-1 py-5 px-4 space-y-1 overflow-y-auto">
+        
+        {/* Main Links */}
+        <div className="space-y-1 mb-8">
+          {navItems.slice(0, 3).map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href);
             return (
-              <div
+              <Link
                 key={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 cursor-not-allowed"
-                title="Coming in Phase 2"
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                  active
+                    ? 'bg-[#Edf5f0] text-[#0A3D2C]'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                }`}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span className="text-sm">{item.label}</span>
-                <span className="ml-auto text-[10px] font-medium bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full">
-                  Soon
-                </span>
-              </div>
+                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#0A3D2C]' : ''}`} />
+                {item.label}
+              </Link>
             );
-          }
+          })}
+        </div>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                active
-                  ? 'bg-green-50 text-green-700 font-medium'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-              }`}
-            >
-              <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-green-600' : ''}`} />
-              {item.label}
-            </Link>
-          );
-        })}
+        {/* Learning Links */}
+        <div className="mb-2 px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">
+          Learning
+        </div>
+        <div className="space-y-1 mb-8">
+          {navItems.slice(3, 6).map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                  active
+                    ? 'bg-[#Edf5f0] text-[#0A3D2C]'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#0A3D2C]' : ''}`} />
+                {item.label}
+                {item.phase2 && (
+                  <span className="ml-auto text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full">
+                    Coming Soon
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
 
-        <div className="pt-2 border-t border-slate-100 mt-2">
+        {/* Settings */}
+        <div className="space-y-1">
           <Link
             href="/dashboard/settings"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
               isActive('/dashboard/settings')
-                ? 'bg-green-50 text-green-700 font-medium'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                ? 'bg-[#Edf5f0] text-[#0A3D2C]'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
             }`}
           >
             <Settings className="w-4 h-4 flex-shrink-0" />
@@ -109,25 +126,12 @@ export default function DashboardSidebar({ userName, userEmail }: Props) {
         </div>
       </nav>
 
-      {/* User section */}
-      <div className="p-3 border-t border-slate-100 flex-shrink-0">
-        <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 transition-colors">
-          <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-sm font-semibold">
-              {(userName || userEmail || 'U')[0].toUpperCase()}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-900 truncate">{userName || 'Student'}</p>
-            <p className="text-xs text-slate-400 truncate">{userEmail}</p>
-          </div>
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="flex-shrink-0 p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-            title="Sign out"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-          </button>
+      {/* Bottom Widget */}
+      <div className="p-5 flex-shrink-0">
+        <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-slate-100 shadow-sm">
+          
+          <h4 className="text-sm font-bold text-slate-900 mb-1 leading-tight">Keep Learning,<br/>Keep Growing</h4>
+          <p className="text-[10px] text-slate-500 leading-relaxed mt-2 font-medium">Small steps every day make a big difference.</p>
         </div>
       </div>
     </aside>

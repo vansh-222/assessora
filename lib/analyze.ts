@@ -6,7 +6,7 @@ interface RawAnalysis {
   subject: string;
   subjectArea: SubjectArea;
   isProgramming: boolean;
-  units: Array<{ id: string; title: string; topics: string[] }>;
+  units: Array<{ id: string; title: string; description?: string; topics: string[] }>;
   topics: Array<{ id: string; title: string; unitId?: string }>;
   concepts: string[];
 }
@@ -28,6 +28,7 @@ Return ONLY a JSON object with exactly this structure:
     {
       "id": "unit-1",
       "title": "Unit name",
+      "description": "A 2-3 sentence summary of what this unit covers.",
       "topics": ["topic1", "topic2", "topic3"]
     }
   ],
@@ -61,6 +62,7 @@ ${text.slice(0, 30000)}
   const units: Unit[] = (raw.units || []).map((u, i) => ({
     id: u.id || `unit-${i + 1}`,
     title: u.title || `Unit ${i + 1}`,
+    description: u.description || '',
     topics: Array.isArray(u.topics) ? u.topics : [],
   }));
 

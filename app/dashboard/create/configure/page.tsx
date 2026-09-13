@@ -2,17 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Info } from 'lucide-react';
-import StepIndicator from '@/components/ui/StepIndicator';
-import { computeBloomDistribution, BLOOM_LABELS, BLOOM_DESCRIPTIONS, BLOOM_COLORS } from '@/lib/bloom';
+import { ArrowLeft, ArrowRight, Settings2, HelpCircle, Flame, Clock, BrainCircuit, Info, Minus, Plus, AlertCircle } from 'lucide-react';
+import { computeBloomDistribution, BLOOM_LABELS, BLOOM_DESCRIPTIONS } from '@/lib/bloom';
 import type { MaterialAnalysis, AssessmentConfig, BloomLevel, BloomDistribution, Difficulty } from '@/types';
-
-const STEPS = [
-  { number: 1, label: 'Material' },
-  { number: 2, label: 'Review' },
-  { number: 3, label: 'Configure' },
-  { number: 4, label: 'Blueprint' },
-];
 
 const BLOOM_ORDER: BloomLevel[] = ['recall', 'understand', 'apply', 'codeTrace', 'analyze'];
 const DURATIONS = [5, 10, 15, 20];
@@ -86,194 +78,258 @@ export default function ConfigurePage() {
 
   if (!analysis) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="spinner border-slate-300 border-t-green-600" />
+      <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
+         <div className="flex flex-col items-center animate-pulse">
+            <div className="w-16 h-16 bg-[#Edf5f0] rounded-full flex items-center justify-center mb-4">
+               <svg className="animate-spin w-8 h-8 text-[#0A3D2C]" viewBox="0 0 50 50">
+                  <circle cx="25" cy="25" r="23" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray="100" strokeDashoffset="25" />
+               </svg>
+            </div>
+            <p className="text-slate-500 font-bold">Loading Configuration...</p>
+         </div>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in max-w-2xl">
-      <div className="mb-8">
-        <StepIndicator steps={STEPS} current={3} />
-      </div>
-
-      <div className="page-header">
-        <h1 className="page-title">Configure Assessment</h1>
-        <p className="page-subtitle">
-          Set the number of questions, difficulty, and Bloom&apos;s taxonomy levels.
+    <div className="animate-fade-in w-full max-w-7xl mx-auto py-4 px-4 sm:px-8 flex flex-col min-h-[calc(100vh-80px)]">
+      
+      {/* Header Section */}
+      <div className="mb-10 max-w-3xl">
+       
+        <h1 className="text-3xl md:text-[30px] font-bold text-[#1a2b25] tracking-tight mb-3">
+          Configure Assessment
+        </h1>
+        <p className="text-slate-500 font-medium text-[15px] leading-relaxed">
+          Fine-tune the parameters of your assessment. Select the difficulty, time limits, and desired cognitive distribution before generating the blueprint.
         </p>
       </div>
 
-      <div className="space-y-5">
-        {/* Question count */}
-        <div className="card p-5">
-          <p className="text-sm font-semibold text-slate-900 mb-3">Number of Questions</p>
-          <div className="flex gap-3">
-            {([5, 10] as const).map((n) => (
-              <button
-                key={n}
-                onClick={() => setQuestionCount(n)}
-                className={`flex-1 py-3 rounded-lg border-2 text-sm font-semibold transition-colors ${
-                  questionCount === n
-                    ? 'border-green-500 bg-green-50 text-green-700'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                {n} Questions
-              </button>
-            ))}
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 flex-1">
+        
+        {/* Left Column: Base Settings */}
+        <div className="flex flex-col space-y-8">
+           <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-8 relative overflow-hidden">
+             
+             {/* Question Count */}
+             <div className="mb-10 relative z-10">
+               <div className="flex items-center gap-2 mb-4">
+                 <div className="w-8 h-8 rounded-lg bg-[#Edf5f0] flex items-center justify-center text-[#0A3D2C]">
+                   <HelpCircle className="w-4 h-4" />
+                 </div>
+                 <h2 className="text-lg font-bold text-slate-900">Number of Questions</h2>
+               </div>
+               
+               <div className="grid grid-cols-2 gap-4">
+                 {([5, 10] as const).map((n) => (
+                   <button
+                     key={n}
+                     onClick={() => setQuestionCount(n)}
+                     className={`relative p-5 rounded-2xl border-2 transition-all flex flex-col items-center justify-center text-center gap-1 overflow-hidden group
+                       ${questionCount === n
+                         ? 'border-[#0A3D2C] bg-[#F9FCFA]'
+                         : 'border-slate-100 bg-white hover:border-[#c1e2d1]'
+                       }`}
+                   >
+                     {questionCount === n && (
+                        <div className="absolute top-0 inset-x-0 h-1 bg-[#0A3D2C]"></div>
+                     )}
+                     <span className={`text-2xl font-bold ${questionCount === n ? 'text-[#0A3D2C]' : 'text-slate-400 group-hover:text-slate-600'}`}>
+                       {n}
+                     </span>
+                     <span className={`text-sm font-semibold ${questionCount === n ? 'text-[#0A3D2C]' : 'text-slate-400 group-hover:text-slate-500'}`}>
+                       Questions
+                     </span>
+                   </button>
+                 ))}
+               </div>
+             </div>
+
+             <div className="w-full h-px bg-slate-100 mb-10"></div>
+
+             {/* Difficulty */}
+             <div className="mb-10 relative z-10">
+               <div className="flex items-center gap-2 mb-4">
+                 <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500">
+                   <Flame className="w-4 h-4" />
+                 </div>
+                 <h2 className="text-lg font-bold text-slate-900">Difficulty Level</h2>
+               </div>
+               
+               <div className="flex p-1.5 bg-slate-50 rounded-xl border border-slate-100">
+                 {(['easy', 'medium', 'hard'] as const).map((d) => (
+                   <button
+                     key={d}
+                     onClick={() => setDifficulty(d)}
+                     className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all capitalize shadow-sm
+                       ${difficulty === d
+                         ? 'bg-white text-slate-900 border border-slate-200 ring-1 ring-black/5'
+                         : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-transparent shadow-none'
+                       }`}
+                   >
+                     {d}
+                   </button>
+                 ))}
+               </div>
+             </div>
+
+             <div className="w-full h-px bg-slate-100 mb-10"></div>
+
+             {/* Duration */}
+             <div className="relative z-10">
+               <div className="flex items-center gap-2 mb-4">
+                 <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500">
+                   <Clock className="w-4 h-4" />
+                 </div>
+                 <h2 className="text-lg font-bold text-slate-900">Time Limit</h2>
+               </div>
+               
+               <div className="grid grid-cols-4 gap-3">
+                 {DURATIONS.map((d) => (
+                   <button
+                     key={d}
+                     onClick={() => setDuration(d)}
+                     className={`py-3.5 rounded-xl border-2 transition-all text-sm font-bold flex flex-col items-center justify-center
+                       ${duration === d
+                         ? 'border-[#0A3D2C] bg-[#F9FCFA] text-[#0A3D2C]'
+                         : 'border-slate-100 bg-white text-slate-500 hover:border-[#c1e2d1] hover:text-slate-700'
+                       }`}
+                   >
+                     {d} <span className="text-[10px] uppercase tracking-wider opacity-70 mt-0.5">Min</span>
+                   </button>
+                 ))}
+               </div>
+             </div>
+             
+           </div>
         </div>
 
-        {/* Difficulty */}
-        <div className="card p-5">
-          <p className="text-sm font-semibold text-slate-900 mb-3">Difficulty</p>
-          <div className="flex gap-3">
-            {(['easy', 'medium', 'hard'] as const).map((d) => {
-              const colors = {
-                easy: questionCount && difficulty === d ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600 hover:border-slate-300',
-                medium: difficulty === d ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-slate-200 text-slate-600 hover:border-slate-300',
-                hard: difficulty === d ? 'border-red-500 bg-red-50 text-red-700' : 'border-slate-200 text-slate-600 hover:border-slate-300',
-              };
-              return (
-                <button
-                  key={d}
-                  onClick={() => setDifficulty(d)}
-                  className={`flex-1 py-3 rounded-lg border-2 text-sm font-semibold transition-colors capitalize ${
-                    difficulty === d
-                      ? d === 'easy' ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                        : d === 'medium' ? 'border-amber-500 bg-amber-50 text-amber-700'
-                        : 'border-red-500 bg-red-50 text-red-700'
-                      : 'border-slate-200 text-slate-600 hover:border-slate-300'
-                  }`}
-                >
-                  {d.charAt(0).toUpperCase() + d.slice(1)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        {/* Right Column: Bloom's Taxonomy */}
+        <div className="flex flex-col space-y-6">
+           <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-8 flex flex-col h-full relative overflow-hidden">
+             
+             {/* Header */}
+             <div className="flex items-start justify-between mb-2 relative z-10">
+               <div className="flex items-center gap-2">
+                 <div className="w-8 h-8 rounded-lg bg-fuchsia-50 flex items-center justify-center text-fuchsia-500">
+                   <BrainCircuit className="w-4 h-4" />
+                 </div>
+                 <h2 className="text-lg font-bold text-slate-900">Cognitive Distribution</h2>
+               </div>
+               <div className={`px-3 py-1 rounded-md text-xs font-bold border ${distValid ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-600 border-red-200'}`}>
+                 {totalDist} / {questionCount}
+               </div>
+             </div>
+             
+             <p className="text-sm font-medium text-slate-500 mb-8 ml-10">
+               Select which cognitive levels to test based on Bloom's Taxonomy.
+             </p>
 
-        {/* Duration */}
-        <div className="card p-5">
-          <p className="text-sm font-semibold text-slate-900 mb-3">Time Limit</p>
-          <div className="grid grid-cols-4 gap-2">
-            {DURATIONS.map((d) => (
-              <button
-                key={d}
-                onClick={() => setDuration(d)}
-                className={`py-2.5 rounded-lg border-2 text-sm font-medium transition-colors ${
-                  duration === d
-                    ? 'border-green-500 bg-green-50 text-green-700'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                {d} min
-              </button>
-            ))}
-          </div>
-        </div>
+             {!analysis.isProgramming && (
+               <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100 mb-6 text-sm font-medium text-slate-600">
+                 <Info className="w-5 h-5 flex-shrink-0 text-slate-400" />
+                 Code Trace level is automatically disabled for non-programming subjects.
+               </div>
+             )}
 
-        {/* Bloom's Taxonomy */}
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-sm font-semibold text-slate-900">Bloom&apos;s Taxonomy</p>
-            <span className={`text-xs font-medium ${distValid ? 'text-green-600' : 'text-amber-600'}`}>
-              {totalDist} / {questionCount} assigned
-            </span>
-          </div>
-          <p className="text-xs text-slate-400 mb-4">
-            Select the cognitive levels to test. Questions will be distributed accordingly.
-          </p>
+             {!distValid && selectedLevels.length > 0 && (
+               <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-100 mb-6 text-sm font-bold text-red-600">
+                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                 Total distribution must equal exactly {questionCount} questions.
+               </div>
+             )}
 
-          {!analysis.isProgramming && (
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-sky-50 border border-sky-100 mb-4 text-xs text-sky-700">
-              <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-              Code Trace is only available for programming subjects.
-            </div>
-          )}
+             {/* Bloom's Levels */}
+             <div className="flex-1 space-y-3 relative z-10">
+               {visibleLevels.map((level) => {
+                 const isSelected = selectedLevels.includes(level);
+                 const count = distribution[level] ?? 0;
 
-          <div className="space-y-2">
-            {visibleLevels.map((level) => {
-              const isSelected = selectedLevels.includes(level);
-              const colors = BLOOM_COLORS[level];
-              const count = distribution[level] ?? 0;
-
-              return (
-                <div
-                  key={level}
-                  className={`rounded-lg border-2 transition-all ${
-                    isSelected ? `${colors.border} ${colors.bg}` : 'border-slate-200 bg-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 p-3">
-                    <button
-                      onClick={() => toggleLevel(level)}
-                      className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        isSelected ? 'border-current bg-current' : 'border-slate-300'
-                      } ${isSelected ? colors.text : ''}`}
-                    >
-                      {isSelected && (
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${isSelected ? colors.text : 'text-slate-500'}`}>
-                        {BLOOM_LABELS[level]}
-                      </p>
-                      <p className="text-xs text-slate-400 truncate">{BLOOM_DESCRIPTIONS[level]}</p>
-                    </div>
-                    {isSelected && (
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => adjustDistribution(level, -1)}
-                          disabled={count <= 1}
-                          className={`w-6 h-6 rounded border flex items-center justify-center text-sm font-bold transition-colors disabled:opacity-30 ${colors.text} ${colors.border} ${colors.bg} hover:opacity-80`}
-                        >
-                          −
-                        </button>
-                        <span className={`w-6 text-center text-sm font-semibold ${colors.text}`}>{count}</span>
-                        <button
-                          onClick={() => adjustDistribution(level, 1)}
-                          disabled={totalDist >= questionCount}
-                          className={`w-6 h-6 rounded border flex items-center justify-center text-sm font-bold transition-colors disabled:opacity-30 ${colors.text} ${colors.border} ${colors.bg} hover:opacity-80`}
-                        >
-                          +
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {!distValid && selectedLevels.length > 0 && (
-            <p className="text-xs text-amber-600 mt-3">
-              ⚠ Distribution must total exactly {questionCount}. Currently {totalDist}.
-            </p>
-          )}
+                 return (
+                   <div
+                     key={level}
+                     className={`rounded-xl border-2 transition-all overflow-hidden ${
+                       isSelected 
+                         ? 'border-[#0A3D2C]/20 bg-[#F9FCFA] shadow-sm' 
+                         : 'border-slate-100 bg-white hover:border-slate-200'
+                     }`}
+                   >
+                     <div className="flex items-center gap-4 p-4">
+                       
+                       {/* Checkbox */}
+                       <button
+                         onClick={() => toggleLevel(level)}
+                         className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                           isSelected 
+                             ? 'border-[#0A3D2C] bg-[#0A3D2C] text-white' 
+                             : 'border-slate-300 text-transparent hover:border-slate-400'
+                         }`}
+                       >
+                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                         </svg>
+                       </button>
+                       
+                       {/* Text */}
+                       <div className="flex-1 min-w-0 pr-4">
+                         <p className={`text-[15px] font-bold ${isSelected ? 'text-[#1a2b25]' : 'text-slate-500'}`}>
+                           {BLOOM_LABELS[level]}
+                         </p>
+                         <p className={`text-xs mt-0.5 truncate ${isSelected ? 'text-slate-600 font-medium' : 'text-slate-400'}`}>
+                           {BLOOM_DESCRIPTIONS[level]}
+                         </p>
+                       </div>
+                       
+                       {/* Controls */}
+                       {isSelected && (
+                         <div className="flex items-center gap-1.5 flex-shrink-0 bg-white border border-[#c1e2d1] rounded-lg p-1 shadow-sm">
+                           <button
+                             onClick={() => adjustDistribution(level, -1)}
+                             disabled={count <= 1}
+                             className="w-7 h-7 rounded-md flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                           >
+                             <Minus className="w-3.5 h-3.5" />
+                           </button>
+                           <span className="w-6 text-center text-sm font-bold text-[#0A3D2C]">
+                             {count}
+                           </span>
+                           <button
+                             onClick={() => adjustDistribution(level, 1)}
+                             disabled={totalDist >= questionCount}
+                             className="w-7 h-7 rounded-md flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                           >
+                             <Plus className="w-3.5 h-3.5" />
+                           </button>
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 );
+               })}
+             </div>
+           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between mt-6">
-        <button onClick={() => router.push('/dashboard/create/analyze')} className="btn-ghost">
+      {/* Footer Navigation */}
+      <div className="mt-8 pt-6 border-t border-slate-200 flex items-center justify-between">
+        <button 
+          onClick={() => router.push('/dashboard/create/analyze')} 
+          className="text-slate-500 hover:text-slate-900 font-bold text-sm flex items-center gap-2 transition-colors px-4 py-2 -ml-4"
+        >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          Back to Analysis
         </button>
         <button
           onClick={handleContinue}
-          className="btn-primary btn-lg"
           disabled={selectedLevels.length === 0 || !distValid}
+          className="bg-[#0A3D2C] hover:bg-[#06281c] text-white disabled:bg-slate-200 disabled:text-slate-400 px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-sm flex items-center gap-2"
         >
           Review Blueprint
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
+
     </div>
   );
 }

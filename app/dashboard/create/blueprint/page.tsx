@@ -2,18 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Loader2, Sparkles, BookOpen, Clock, Target, BarChart3 } from 'lucide-react';
-import StepIndicator from '@/components/ui/StepIndicator';
-import ProcessingSteps from '@/components/ui/ProcessingSteps';
-import { BLOOM_LABELS, BLOOM_COLORS } from '@/lib/bloom';
+import { ArrowLeft, Loader2, Sparkles, BookOpen, Clock, Target, BarChart3, FileText, CheckCircle2 } from 'lucide-react';
+import { BLOOM_LABELS } from '@/lib/bloom';
 import type { MaterialAnalysis, AssessmentConfig, BloomLevel, ProcessingStep } from '@/types';
-
-const STEPS = [
-  { number: 1, label: 'Material' },
-  { number: 2, label: 'Review' },
-  { number: 3, label: 'Configure' },
-  { number: 4, label: 'Blueprint' },
-];
 
 export default function BlueprintPage() {
   const router = useRouter();
@@ -102,8 +93,15 @@ export default function BlueprintPage() {
 
   if (!analysis || !config) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="spinner border-slate-300 border-t-green-600" />
+      <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
+         <div className="flex flex-col items-center animate-pulse">
+            <div className="w-16 h-16 bg-[#Edf5f0] rounded-full flex items-center justify-center mb-4">
+               <svg className="animate-spin w-8 h-8 text-[#0A3D2C]" viewBox="0 0 50 50">
+                  <circle cx="25" cy="25" r="23" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray="100" strokeDashoffset="25" />
+               </svg>
+            </div>
+            <p className="text-slate-500 font-bold">Loading Blueprint...</p>
+         </div>
       </div>
     );
   }
@@ -111,144 +109,200 @@ export default function BlueprintPage() {
   const bloomEntries = Object.entries(config.bloomDistribution) as [BloomLevel, number][];
 
   return (
-    <div className="animate-fade-in max-w-2xl">
-      <div className="mb-8">
-        <StepIndicator steps={STEPS} current={4} />
-      </div>
-
-      <div className="page-header">
-        <h1 className="page-title">Assessment Blueprint</h1>
-        <p className="page-subtitle">
-          Review your assessment configuration before generating questions.
+    <div className="animate-fade-in w-full max-w-7xl mx-auto py-4 px-4 sm:px-8 flex flex-col min-h-[calc(100vh-80px)]">
+      
+      {/* Header Section */}
+      <div className="mb-10 max-w-3xl">
+        
+        <h1 className="text-3xl md:text-[30px] font-bold text-[#1a2b25] tracking-tight mb-3">
+          Assessment Blueprint
+        </h1>
+        <p className="text-slate-500 font-medium text-[15px] leading-relaxed">
+          Review your final assessment structure. Give it a descriptive name and generate your questions when ready.
         </p>
       </div>
 
-      {/* Assessment title */}
-      <div className="card p-5 mb-4">
-        <label className="label">Assessment Name</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="input"
-          placeholder="Assessment name"
-        />
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 flex-1">
+        
+        {/* Left Column: Core Details */}
+        <div className="flex flex-col space-y-6">
+           
+           {/* Title Input */}
+           <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-8">
+             <label className="block text-sm font-bold text-slate-900 mb-3">Assessment Name</label>
+             <input
+               type="text"
+               value={title}
+               onChange={(e) => setTitle(e.target.value)}
+               className="w-full bg-[#F9FCFA] border border-[#c1e2d1] rounded-2xl px-5 py-4 text-[15px] font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#Edf5f0] focus:border-[#0A3D2C] transition-all shadow-sm"
+               placeholder="e.g. Operating Systems Final Exam"
+             />
+           </div>
 
-      {/* Blueprint summary */}
-      <div className="card p-5 mb-4">
-        <p className="text-sm font-semibold text-slate-900 mb-4">Configuration Summary</p>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50">
-            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
-              <BookOpen className="w-4 h-4 text-slate-500" />
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">Subject</p>
-              <p className="text-sm font-medium text-slate-900">{analysis.subject}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50">
-            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
-              <BarChart3 className="w-4 h-4 text-slate-500" />
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">Questions</p>
-              <p className="text-sm font-medium text-slate-900">{config.questionCount} questions</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50">
-            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
-              <Target className="w-4 h-4 text-slate-500" />
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">Difficulty</p>
-              <p className="text-sm font-medium text-slate-900 capitalize">{config.difficulty}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50">
-            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
-              <Clock className="w-4 h-4 text-slate-500" />
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">Time Limit</p>
-              <p className="text-sm font-medium text-slate-900">{config.duration} minutes</p>
-            </div>
-          </div>
+           {/* Configuration Summary */}
+           <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-8">
+             <h2 className="text-sm font-bold text-slate-900 mb-6">Configuration Summary</h2>
+             <div className="grid grid-cols-2 gap-4">
+               
+               <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                 <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-200 flex items-center justify-center flex-shrink-0">
+                   <BookOpen className="w-5 h-5 text-[#0A3D2C]" />
+                 </div>
+                 <div>
+                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Subject</p>
+                   <p className="text-[13px] font-bold text-slate-900 truncate max-w-[120px]" title={analysis.subject}>{analysis.subject}</p>
+                 </div>
+               </div>
+
+               <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                 <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-200 flex items-center justify-center flex-shrink-0">
+                   <BarChart3 className="w-5 h-5 text-[#0A3D2C]" />
+                 </div>
+                 <div>
+                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Questions</p>
+                   <p className="text-[13px] font-bold text-slate-900">{config.questionCount}</p>
+                 </div>
+               </div>
+
+               <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                 <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-200 flex items-center justify-center flex-shrink-0">
+                   <Target className="w-5 h-5 text-[#0A3D2C]" />
+                 </div>
+                 <div>
+                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Difficulty</p>
+                   <p className="text-[13px] font-bold text-slate-900 capitalize">{config.difficulty}</p>
+                 </div>
+               </div>
+
+               <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                 <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-200 flex items-center justify-center flex-shrink-0">
+                   <Clock className="w-5 h-5 text-[#0A3D2C]" />
+                 </div>
+                 <div>
+                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Time Limit</p>
+                   <p className="text-[13px] font-bold text-slate-900">{config.duration} min</p>
+                 </div>
+               </div>
+
+             </div>
+           </div>
+
+           {/* Topic Coverage */}
+           <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-8">
+             <div className="flex items-center justify-between mb-4">
+               <h2 className="text-sm font-bold text-slate-900">Topic Coverage</h2>
+               <span className="text-[10px] font-bold text-slate-400 uppercase">{analysis.topics.length} Total</span>
+             </div>
+             <div className="flex flex-wrap gap-2">
+               {analysis.topics.slice(0, 10).map((t) => (
+                 <span key={t.id} className="px-3 py-1.5 rounded-lg bg-[#F9FCFA] border border-[#c1e2d1] text-[11px] font-bold text-[#0A3D2C]">
+                   {t.title}
+                 </span>
+               ))}
+               {analysis.topics.length > 10 && (
+                 <span className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-[11px] font-bold text-slate-500">
+                   +{analysis.topics.length - 10} more
+                 </span>
+               )}
+             </div>
+           </div>
+        </div>
+
+        {/* Right Column: Distribution & Generation */}
+        <div className="flex flex-col space-y-6">
+           
+           {/* Bloom distribution */}
+           <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-8">
+             <h2 className="text-sm font-bold text-slate-900 mb-6">Cognitive Distribution</h2>
+             <div className="space-y-4">
+               {bloomEntries.map(([level, count]) => {
+                 if (!count) return null;
+                 const pct = Math.round((count / config.questionCount) * 100);
+                 
+                 // Generate a custom monochromatic green scale based on pct or index
+                 // We'll just use the primary color with varying opacity for a sleek look
+                 return (
+                   <div key={level} className="flex items-center gap-4">
+                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider w-20 flex-shrink-0">
+                       {BLOOM_LABELS[level]}
+                     </span>
+                     <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden flex">
+                       <div
+                         className="h-full rounded-full bg-[#0A3D2C] transition-all"
+                         style={{ width: `${pct}%`, opacity: 0.6 + (pct / 100) * 0.4 }}
+                       />
+                     </div>
+                     <span className="text-sm font-bold text-[#0A3D2C] w-12 text-right flex-shrink-0 bg-[#Edf5f0] px-2 py-1 rounded-md">
+                       {count}
+                     </span>
+                   </div>
+                 );
+               })}
+             </div>
+           </div>
+
+           {/* Generating State */}
+           {generating && (
+             <div className="bg-[#0A3D2C] rounded-[24px] shadow-sm p-8 text-white relative overflow-hidden">
+               {/* Background Glow */}
+               <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+               
+               <h2 className="text-sm font-bold text-white/80 uppercase tracking-wider mb-6 flex items-center gap-2">
+                 <Sparkles className="w-4 h-4" />
+                 Generating Assessment
+               </h2>
+               
+               <div className="space-y-4 relative z-10">
+                 {processingSteps.map((step, i) => (
+                   <div key={i} className={`flex items-center gap-3 transition-opacity duration-300 ${step.status === 'pending' ? 'opacity-40' : 'opacity-100'}`}>
+                     <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                       step.status === 'done' ? 'bg-emerald-400 text-[#0A3D2C]' :
+                       step.status === 'active' ? 'bg-white/20 text-white' : 'bg-white/10 text-white/40'
+                     }`}>
+                       {step.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> : 
+                        step.status === 'active' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 
+                        <div className="w-1.5 h-1.5 rounded-full bg-current"></div>}
+                     </div>
+                     <span className={`text-sm font-medium ${step.status === 'done' ? 'text-emerald-300' : 'text-white'}`}>
+                       {step.label}
+                     </span>
+                   </div>
+                 ))}
+               </div>
+             </div>
+           )}
+
+           {/* Error */}
+           {error && (
+             <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-700">
+               <div className="w-5 h-5 mt-0.5 shrink-0 bg-red-100 rounded-full flex items-center justify-center">!</div>
+               <p className="text-sm font-bold">{error}</p>
+             </div>
+           )}
+
         </div>
       </div>
 
-      {/* Bloom distribution */}
-      <div className="card p-5 mb-4">
-        <p className="text-sm font-semibold text-slate-900 mb-3">Bloom&apos;s Taxonomy Distribution</p>
-        <div className="space-y-2">
-          {bloomEntries.map(([level, count]) => {
-            if (!count) return null;
-            const colors = BLOOM_COLORS[level];
-            const pct = Math.round((count / config.questionCount) * 100);
-            return (
-              <div key={level} className="flex items-center gap-3">
-                <span className={`badge ${colors.bg} ${colors.text} ${colors.border} w-28 justify-center flex-shrink-0`}>
-                  {BLOOM_LABELS[level]}
-                </span>
-                <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${colors.bg.replace('bg-', 'bg-').replace('-50', '-400')}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-                <span className="text-sm font-medium text-slate-700 w-16 text-right flex-shrink-0">
-                  {count} Q{count !== 1 ? 's' : ''}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Topic coverage */}
-      <div className="card p-5 mb-6">
-        <p className="text-sm font-semibold text-slate-900 mb-3">Topic Coverage</p>
-        <div className="flex flex-wrap gap-1.5">
-          {analysis.topics.slice(0, 12).map((t) => (
-            <span key={t.id} className="badge-slate">{t.title}</span>
-          ))}
-          {analysis.topics.length > 12 && (
-            <span className="badge-slate">+{analysis.topics.length - 12} more</span>
-          )}
-        </div>
-      </div>
-
-      {/* Processing */}
-      {generating && (
-        <div className="card p-5 mb-5">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">
-            Generating Assessment
-          </p>
-          <ProcessingSteps steps={processingSteps} />
-        </div>
-      )}
-
-      {/* Error */}
-      {error && (
-        <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm mb-5">
-          {error}
-        </div>
-      )}
-
-      {/* Navigation */}
+      {/* Footer Navigation */}
       {!generating && (
-        <div className="flex items-center justify-between">
-          <button onClick={() => router.push('/dashboard/create/configure')} className="btn-ghost">
+        <div className="mt-8 pt-6 border-t border-slate-200 flex items-center justify-between">
+          <button 
+            onClick={() => router.push('/dashboard/create/configure')} 
+            className="text-slate-500 hover:text-slate-900 font-bold text-sm flex items-center gap-2 transition-colors px-4 py-2 -ml-4"
+          >
             <ArrowLeft className="w-4 h-4" />
-            Back
+            Back to Settings
           </button>
-          <button onClick={handleGenerate} className="btn-primary btn-lg">
-            <Sparkles className="w-4 h-4" />
+          <button
+            onClick={handleGenerate}
+            className="bg-[#0A3D2C] hover:bg-[#06281c] text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-md flex items-center gap-2 hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <Sparkles className="w-4 h-4 text-emerald-400" />
             Generate Assessment
           </button>
         </div>
       )}
+
     </div>
   );
 }

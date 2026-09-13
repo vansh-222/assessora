@@ -17,7 +17,7 @@ export async function GET() {
 
     const [totalAssessments, attempts, recentRaw] = await Promise.all([
       Assessment.countDocuments({ userId }),
-      Attempt.find({ userId }).select('percentage weaknesses').lean(),
+      Attempt.find({ userId }).select('percentage weaknesses topicPerformance timeTaken').lean(),
       Assessment.find({ userId })
         .sort({ createdAt: -1 })
         .limit(5)
@@ -30,17 +30,43 @@ export async function GET() {
         ? Math.round(attempts.reduce((sum, a) => sum + (a.percentage || 0), 0) / completed)
         : 0;
 
-    const weakAreaMap: Record<string, number> = {};
+    const totalStudyTimeSeconds = attempts.reduce((sum, a) => sum + (a.timeTaken || 0), 0);
+
+    // Aggregate topic performance across all attempts
+    const topicStats: Record<string, { correct: number; total: number }> = {};
     for (const attempt of attempts) {
-      const weaknesses = attempt.weaknesses || [];
-      for (const w of weaknesses) {
-        weakAreaMap[w] = (weakAreaMap[w] || 0) + 1;
+      if (attempt.topicPerformance) {
+        for (const [topic, stats] of Object.entries(attempt.topicPerformance as Record<string, { correct: number; total: number }>)) {
+          if (!topicStats[topic]) topicStats[topic] = { correct: 0, total: 0 };
+          topicStats[topic].correct += stats.correct;
+          topicStats[topic].total += stats.total;
+        }
       }
     }
-    const needsAttention = Object.entries(weakAreaMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 4)
-      .map(([topic]) => topic);
+
+    // Calculate concepts mastered (topics with >80% score and at least 3 questions)
+    let conceptsMastered = 0;
+    const needsAttention = [];
+
+    for (const [topic, stats] of Object.entries(topicStats)) {
+      if (stats.total > 0) {
+        const percentage = Math.round((stats.correct / stats.total) * 100);
+        if (percentage >= 80 && stats.total >= 3) {
+          conceptsMastered++;
+        }
+        
+        // Let's populate needsAttention with topics that have lowest scores
+        needsAttention.push({
+          topic,
+          score: percentage,
+          status: percentage < 60 ? 'Needs Practice' : percentage < 80 ? 'Developing' : 'Strong'
+        });
+      }
+    }
+
+    // Sort needsAttention by lowest score first, take top 4
+    needsAttention.sort((a, b) => a.score - b.score);
+    const topNeedsAttention = needsAttention.slice(0, 4);
 
     // Fetch latest attempt for each recent assessment
     const recentAssessments = await Promise.all(
@@ -68,8 +94,10 @@ export async function GET() {
       totalAssessments,
       completed,
       avgScore,
-      needsAttention,
+      needsAttention: topNeedsAttention,
       recentAssessments,
+      totalStudyTimeSeconds,
+      conceptsMastered
     });
   } catch (err) {
     console.error('[dashboard/stats]', err);

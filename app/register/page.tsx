@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, Eye, EyeOff, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -55,45 +56,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex w-[420px] bg-green-600 flex-col justify-between p-10 flex-shrink-0">
-        <div>
-          <div className="flex items-center gap-2 mb-16">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-white text-lg">Assessora</span>
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-4 leading-tight">
-            Start mastering your subject today
-          </h2>
-          <p className="text-green-100 text-base leading-relaxed">
-            Create an account in seconds. Upload your first assessment material and see results in minutes.
-          </p>
-        </div>
-        <div className="bg-white/10 rounded-xl p-5">
-          <p className="text-white font-medium text-sm mb-1">Free to use</p>
-          <p className="text-green-100 text-xs leading-relaxed">
-            Assessora is completely free. No credit card required. Start creating assessments immediately after signing up.
-          </p>
-        </div>
-      </div>
-
-      {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-slate-900 text-lg">Assessora</span>
-          </div>
-
+    <div className="min-h-screen bg-white flex">
+      
+      {/* Left panel - Auth Form */}
+      <div className="w-full lg:w-1/2 flex flex-col p-4 md:p-3 lg:p-4 relative overflow-y-auto">
+        <Link href="/" className="inline-flex items-center gap-2 bg-white px-4 py-2 ">
+          <Image src="/logo.png" alt="Assessora" width={140} height={35} className="object-contain" />
+        </Link>
+        
+        <div className="w-full max-w-md mx-auto flex-1">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 mb-1">Create your account</h1>
-            <p className="text-slate-500 text-sm">Free to use, no credit card required.</p>
+            <h1 className="text-3xl font-bold text-[#0A3D2C] mb-2">Create Account</h1>
+            <p className="text-slate-500 text-sm">Join Assessora and start transforming your study materials into powerful assessments.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -104,35 +78,35 @@ export default function RegisterPage() {
             )}
 
             <div>
-              <label htmlFor="name" className="label">Full name</label>
+              <label htmlFor="name" className="block text-sm font-bold text-[#0A3D2C] mb-1.5">Full name</label>
               <input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
-                className="input"
+                placeholder="John Doe"
+                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A3D2C] focus:ring-1 focus:ring-[#0A3D2C] transition-colors"
                 required
                 autoComplete="name"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="label">Email address</label>
+              <label htmlFor="email" className="block text-sm font-bold text-[#0A3D2C] mb-1.5">Email address</label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="input"
+                placeholder="name@example.com"
+                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A3D2C] focus:ring-1 focus:ring-[#0A3D2C] transition-colors"
                 required
                 autoComplete="email"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="label">Password</label>
+              <label htmlFor="password" className="block text-sm font-bold text-[#0A3D2C] mb-1.5">Password</label>
               <div className="relative">
                 <input
                   id="password"
@@ -140,14 +114,14 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="input pr-10"
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A3D2C] focus:ring-1 focus:ring-[#0A3D2C] transition-colors pr-10"
                   required
                   minLength={6}
                   autoComplete="new-password"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#0A3D2C]"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -158,7 +132,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-3"
+              className="w-full py-3.5 bg-[#0A3D2C] hover:bg-[#072a1e] text-white rounded-lg font-bold transition-colors flex items-center justify-center gap-2 shadow-md mt-2"
             >
               {loading ? (
                 <>
@@ -166,23 +140,86 @@ export default function RegisterPage() {
                   Creating account...
                 </>
               ) : (
-                'Create account'
+                'Create Account'
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-8 text-center text-sm text-slate-500">
             Already have an account?{' '}
-            <Link href="/login" className="text-green-600 font-medium hover:text-green-700">
+            <Link href="/login" className="font-bold text-[#0A3D2C] hover:underline">
               Sign in
             </Link>
           </p>
-
-          <p className="mt-4 text-center text-xs text-slate-400">
-            By creating an account, you agree to use this platform responsibly.
-          </p>
         </div>
       </div>
+
+            {/* Right panel - Marketing showcase */}
+      <div className="hidden lg:flex w-1/2 p-6 h-screen">
+        <div className="w-full h-full bg-[#0A3D2C] rounded-[2rem] flex flex-col items-center justify-center relative overflow-hidden">
+          
+          {/* Constellation Graphics (CSS Mockup) */}
+          <div className="relative w-full max-w-md aspect-square flex items-center justify-center mb-1">
+            
+            {/* Connection Lines (SVG) */}
+            <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
+              <path d="M150,200 L120,200 Q100,200 100,220 L100,250 Q100,280 130,280 L200,280" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+              <path d="M300,100 L350,100 Q380,100 380,130 L380,150 Q380,180 350,180 L280,180" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+            </svg>
+
+            {/* Main Avatar */}
+            <div className="w-64 h-64 bg-emerald-100 rounded-full border-8 border-[#0A3D2C] z-10 relative shadow-2xl flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-200 to-emerald-50"></div>
+              {/* Fallback avatar SVG since we don't have the image asset */}
+              <svg className="w-32 h-32 text-emerald-700 relative z-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+
+            {/* Floating avatars */}
+            <div className="absolute top-1/4 left-8 w-14 h-14 bg-white rounded-full border-4 border-[#0A3D2C] z-10 flex items-center justify-center text-emerald-600 shadow-xl overflow-hidden">
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            
+            <div className="absolute top-12 right-12 w-20 h-20 bg-white rounded-full border-4 border-[#0A3D2C] z-10 flex items-center justify-center text-emerald-600 shadow-xl overflow-hidden">
+              <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+
+            {/* Little floating dots */}
+            <div className="absolute top-8 left-1/3 w-4 h-4 bg-white/60 rounded-full" />
+            <div className="absolute bottom-12 right-1/4 w-6 h-6 bg-white rounded-full" />
+
+            {/* Live Class Badge */}
+            <div className="absolute bottom-15 left-12 bg-white rounded-xl p-2.5 shadow-xl border border-white/20 z-20 flex items-center gap-3 pr-4">
+               <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center relative">
+                 <svg className="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                 <div className="absolute -bottom-1 -right-1 bg-[#0A3D2C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full border border-white">Live</div>
+               </div>
+               <div>
+                 <div className="text-xs font-bold text-slate-900 leading-tight mb-0.5">Live 1-on-1 Classes</div>
+                 <div className="flex items-center gap-1">
+                   <div className="flex text-amber-400">
+                     <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                     <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                     <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                     <svg className="w-2.5 h-2.5 text-slate-200" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                   </div>
+                   <span className="text-[8px] text-slate-500 font-medium">5.0 Rating</span>
+                 </div>
+               </div>
+            </div>
+          </div>
+
+          {/* Text Content */}
+          <div className="text-center px-4 relative z-10 max-w-lg">
+            <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Introducing new features</h2>
+            <p className="text-emerald-50 text-sm leading-relaxed mb-12">
+              We understand that in many places, high-quality education is reserved for the elite. Our mission is to democratize access. 
+            </p>
+          </div>
+
+          
+        </div>
+      </div>
+
     </div>
   );
 }

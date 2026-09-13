@@ -13,12 +13,13 @@ export default function PracticePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Fetch stats to get weak topics
     fetch('/api/dashboard/stats')
       .then(res => res.json())
       .then(data => {
         if (data.needsAttention) {
-          setWeakTopics(data.needsAttention);
+          // Map the objects to just their string names before setting state
+          const topicStrings = data.needsAttention.map((t: any) => t.name || t.topic);
+          setWeakTopics(topicStrings);
         }
       })
       .catch(err => {
@@ -30,7 +31,7 @@ export default function PracticePage() {
 
   const handleStartPractice = async () => {
     if (weakTopics.length === 0) return;
-    
+
     setGenerating(true);
     setError('');
 
@@ -42,7 +43,7 @@ export default function PracticePage() {
       });
 
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Failed to generate practice session');
       }
@@ -106,7 +107,7 @@ export default function PracticePage() {
                 <p className="text-sm text-slate-600 mb-4">
                   Based on your recent performance, we recommend focusing on these topics:
                 </p>
-                
+
                 <div className="flex flex-wrap gap-2 mb-6">
                   {weakTopics.slice(0, 3).map(topic => (
                     <span key={topic} className="badge-amber text-sm py-1 px-3">
@@ -115,7 +116,7 @@ export default function PracticePage() {
                   ))}
                 </div>
 
-                <button 
+                <button
                   onClick={handleStartPractice}
                   disabled={generating}
                   className="btn-primary w-full sm:w-auto shadow-md shadow-green-600/20"

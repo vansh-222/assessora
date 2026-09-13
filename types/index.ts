@@ -8,6 +8,7 @@ export type AssessmentStatus = 'active' | 'completed';
 export interface Unit {
   id: string;
   title: string;
+  description?: string;
   topics: string[];
 }
 

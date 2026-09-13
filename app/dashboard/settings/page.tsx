@@ -1,8 +1,8 @@
-// app/dashboard/settings/page.tsx
-import { auth } from '@/auth';
+import { auth, signOut } from '@/auth';
 import { connectDB } from '@/lib/db';
 import { User } from '@/lib/models/User';
 import type { Metadata } from 'next';
+import { LogOut } from 'lucide-react';
 
 export const metadata: Metadata = { title: 'Settings' };
 
@@ -52,6 +52,23 @@ export default async function SettingsPage() {
             <code className="font-mono bg-amber-100 px-1 rounded">GROQ_API_KEY=your_key</code>
           </p>
         </div>
+
+        <div className="divider" />
+        
+        <form
+          action={async () => {
+            'use server';
+            await signOut({ redirectTo: '/login' });
+          }}
+        >
+          <button
+            type="submit"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-red-200 bg-red-50 text-red-600 font-bold text-sm hover:bg-red-100 transition-colors shadow-sm"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </button>
+        </form>
       </div>
     </div>
   );
