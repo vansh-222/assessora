@@ -1,8 +1,9 @@
-﻿// app/dashboard/assessments/page.tsx
+// app/dashboard/assessments/page.tsx
 import { auth } from '@/auth';
 import { connectDB } from '@/lib/db';
 import { Assessment } from '@/lib/models/Assessment';
 import { Attempt } from '@/lib/models/Attempt';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
   PlusCircle, 
@@ -20,7 +21,7 @@ import {
   Plus
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
-import type { Metadata } from 'next';
+import { DeleteAssessmentButton } from './DeleteAssessmentButton';
 
 export const metadata: Metadata = { title: 'My Assessments' };
 
@@ -254,9 +255,7 @@ export default async function AssessmentsPage({
                 <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
                   <Icon className="w-6 h-6 text-emerald-500" />
                 </div>
-                <button className="text-slate-400 hover:text-slate-600 transition-colors">
-                  <MoreHorizontal className="w-5 h-5" />
-                </button>
+                <DeleteAssessmentButton id={a.id} />
               </div>
 
               {/* Title & Subject */}

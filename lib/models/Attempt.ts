@@ -19,6 +19,8 @@ export interface IAttempt extends Document {
   weaknesses: string[];
   bloomPerformance: Record<string, { correct: number; total: number }>;
   topicPerformance: Record<string, { correct: number; total: number }>;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const AttemptSchema = new Schema<IAttempt>(

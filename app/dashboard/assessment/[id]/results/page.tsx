@@ -237,8 +237,8 @@ export default function ResultsPage() {
             {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
             Export Report PDF
           </button>
-          <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#046B46] hover:bg-[#035437] px-5 py-2.5 rounded-full transition-colors shadow-md shadow-emerald-900/10">
-            Dashboard <ArrowRight className="w-3.5 h-3.5" />
+          <Link href={`/dashboard/assessment/${assessment.id}/analysis?attempt=${attempt.id}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#046B46] hover:bg-[#035437] px-5 py-2.5 rounded-full transition-colors shadow-md shadow-emerald-900/10">
+            <Sparkles className="w-3.5 h-3.5" /> AI Analysis <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

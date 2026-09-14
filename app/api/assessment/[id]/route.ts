@@ -49,3 +49,32 @@ export async function GET(
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  try {
+    const { id } = await params;
+    await connectDB();
+
+    const assessment = await Assessment.findById(id).lean();
+    if (!assessment) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (assessment.userId !== session.user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    // Delete attempts for this assessment
+    const { Attempt } = await import('@/lib/models/Attempt');
+    await Attempt.deleteMany({ assessmentId: id });
+
+    // Delete assessment
+    await Assessment.findByIdAndDelete(id);
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('[assessment/delete]', err);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
+}
