@@ -14,16 +14,27 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { topics } = await req.json();
+    const body = await req.json();
+    const { topics, difficulty = 'medium', bloomLevel, questionCount = 5 } = body;
+
     if (!topics || !Array.isArray(topics) || topics.length === 0) {
       return NextResponse.json({ error: 'No topics provided' }, { status: 400 });
     }
 
+    const count = Math.min(Math.max(questionCount, 3), 20);
+    const difficultyLabel = difficulty || 'medium';
+    const bloomInstruction = bloomLevel
+      ? `All questions must be at the "${bloomLevel}" Bloom's taxonomy level.`
+      : 'Use a mix of Bloom taxonomy levels (recall, understand, apply, analyze).';
+
     const prompt = `You are an expert academic assessment designer.
-Generate exactly 5 multiple-choice practice questions focused ONLY on the following weak topics:
+Generate exactly ${count} multiple-choice practice questions focused ONLY on the following topics:
 ${topics.join(', ')}
 
-Return ONLY a JSON array of exactly 5 question objects following this exact structure:
+Difficulty level: ${difficultyLabel}
+${bloomInstruction}
+
+Return ONLY a JSON array of exactly ${count} question objects following this exact structure:
 {
   "question": "Clear, specific question text",
   "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
@@ -31,8 +42,8 @@ Return ONLY a JSON array of exactly 5 question objects following this exact stru
   "explanation": "Detailed explanation of why the answer is correct",
   "topic": "The specific topic from the list provided above",
   "concept": "The specific concept being tested",
-  "bloomLevel": "understand",
-  "difficulty": "medium",
+  "bloomLevel": "${bloomLevel || 'understand'}",
+  "difficulty": "${difficultyLabel}",
   "sourceConcept": "The term/concept being tested"
 }
 
@@ -45,13 +56,13 @@ CRITICAL RULES:
     let practiceQuestions: Question[] = [];
     let attempts = 0;
 
-    while (practiceQuestions.length < 5 && attempts < 3) {
+    while (practiceQuestions.length < count && attempts < 3) {
       attempts++;
       try {
         const raw = await generateJSON<any[]>(prompt);
         const { valid } = validateQuestions(Array.isArray(raw) ? raw : []);
         if (valid.length > 0) {
-          practiceQuestions = valid.slice(0, 5);
+          practiceQuestions = valid.slice(0, count);
         }
       } catch (err) {
         console.error(`Practice generation attempt ${attempts} failed:`, err);
@@ -64,22 +75,28 @@ CRITICAL RULES:
 
     await connectDB();
 
-    // Create a new assessment document for the practice session
+    const bloomDist: Record<string, number> = {};
+    if (bloomLevel) {
+      bloomDist[bloomLevel] = practiceQuestions.length;
+    } else {
+      bloomDist['understand'] = practiceQuestions.length;
+    }
+
     const assessment = await Assessment.create({
       userId: session.user.id,
-      title: 'Targeted Practice Session',
-      subject: 'Mixed Review',
-      difficulty: 'medium',
+      title: `Practice: ${topics.slice(0, 2).join(', ')}${topics.length > 2 ? ` +${topics.length - 2}` : ''}`,
+      subject: 'Practice Session',
+      difficulty: difficultyLabel,
       questionCount: practiceQuestions.length,
-      duration: 5, // 5 minutes
-      bloomDistribution: { understand: practiceQuestions.length },
+      duration: Math.ceil(practiceQuestions.length * 1.5),
+      bloomDistribution: bloomDist,
       questions: practiceQuestions,
       analysis: {
-        subject: 'Mixed Review',
+        subject: 'Practice Session',
         subjectArea: 'other',
         isProgramming: false,
         units: [],
-        topics: topics.map((t, i) => ({ id: `t${i}`, title: t })),
+        topics: topics.map((t: string, i: number) => ({ id: `t${i}`, title: t })),
         concepts: [],
         rawText: 'Practice Session',
       },

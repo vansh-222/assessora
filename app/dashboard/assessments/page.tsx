@@ -1,4 +1,4 @@
-// app/dashboard/assessments/page.tsx
+﻿// app/dashboard/assessments/page.tsx
 import { auth } from '@/auth';
 import { connectDB } from '@/lib/db';
 import { Assessment } from '@/lib/models/Assessment';
@@ -92,7 +92,7 @@ const CircularProgress = ({ percentage, status }: { percentage: number | null, s
 export default async function AssessmentsPage({
   searchParams,
 }: {
-  searchParams: { filter?: string };
+  searchParams: Promise<{ filter?: string }>;
 }) {
   const session = await auth();
   const userId = session!.user!.id!;
@@ -149,7 +149,8 @@ export default async function AssessmentsPage({
     : 0;
 
   // Apply Filter
-  const activeFilter = searchParams.filter || 'all';
+  const resolvedParams = await searchParams;
+  const activeFilter = resolvedParams.filter || 'all';
   const filteredAssessments = allAssessments.filter(a => {
     if (activeFilter === 'completed') return a.mappedStatus === 'Completed';
     if (activeFilter === 'in_progress') return a.mappedStatus === 'In Progress';
@@ -237,7 +238,7 @@ export default async function AssessmentsPage({
           </Link>
         </div>
         <div className="flex items-center border border-slate-200 rounded-lg px-3 py-1.5 bg-white text-xs font-bold text-slate-600 cursor-pointer shadow-sm">
-          Sort by: Newest <span className="ml-2">▼</span>
+          Sort by: Newest <span className="ml-2">â–¼</span>
         </div>
       </div>
 
@@ -350,3 +351,4 @@ export default async function AssessmentsPage({
     </div>
   );
 }
+

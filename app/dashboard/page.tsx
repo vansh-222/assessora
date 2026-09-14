@@ -43,7 +43,7 @@ export default async function DashboardPage() {
     Attempt.find({ userId }).select('percentage weaknesses topicPerformance timeTaken').lean(),
     Assessment.find({ userId })
       .sort({ createdAt: -1 })
-      .limit(5)
+      .limit(2)
       .lean(),
   ]);
 

@@ -1,8 +1,9 @@
-// app/dashboard/layout.tsx
+﻿// app/dashboard/layout.tsx
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import DashboardSidebar from '@/components/layout/DashboardSidebar';
 import DashboardTopBar from '@/components/layout/DashboardTopBar';
+import { DashboardAssistantWrapper } from '@/components/assistant/DashboardAssistantWrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -20,26 +21,22 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#F9FAFB] font-sans selection:bg-emerald-200">
-      {/* Sidebar */}
       <DashboardSidebar
         userName={session.user.name}
         userEmail={session.user.email}
       />
-
-      {/* Main content wrapper */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        
-        {/* Top Navigation Bar */}
         <DashboardTopBar userName={session.user.name} />
-
-        {/* Scrollable Page Content */}
         <main className="flex-1 overflow-y-auto">
           <div className="w-full h-full">
             {children}
           </div>
         </main>
-        
       </div>
+      <DashboardAssistantWrapper
+        userName={session.user.name}
+        userEmail={session.user.email}
+      />
     </div>
   );
 }
