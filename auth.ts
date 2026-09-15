@@ -1,6 +1,7 @@
 // auth.ts — Next Auth v5 with JWT sessions + MongoDB user lookup
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { connectDB } from '@/lib/db';
 import { User } from '@/lib/models/User';
@@ -8,6 +9,10 @@ import type { NextAuthConfig } from 'next-auth';
 
 export const authConfig: NextAuthConfig = {
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     Credentials({
       name: 'credentials',
       credentials: {
@@ -37,6 +42,24 @@ export const authConfig: NextAuthConfig = {
   session: { strategy: 'jwt' },
 
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google') {
+        await connectDB();
+        const existingUser = await User.findOne({ email: user.email?.toLowerCase().trim() });
+        
+        if (!existingUser) {
+          const newUser = await User.create({
+            name: user.name,
+            email: user.email?.toLowerCase().trim(),
+          });
+          user.id = newUser._id.toString();
+        } else {
+          user.id = existingUser._id.toString();
+        }
+        return true;
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;

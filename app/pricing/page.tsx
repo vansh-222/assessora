@@ -326,6 +326,7 @@ export default function PricingPage() {
                 <div className="lg:col-span-5 grid grid-cols-2 md:grid-cols-3 gap-8">
                   <div>
                     <div className="mb-4">
+                      <GraduationCap className="w-5 h-5 text-[#046B46] mb-2" />
                       <h4 className="text-[15px] font-bold text-[#046B46]">Product</h4>
                     </div>
                     <ul className="space-y-3.5">

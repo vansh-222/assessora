@@ -6,7 +6,7 @@ import {
   Leaf,
   BookOpen,
   Sparkles,
-  PlayCircle,
+  Play,
   FileText,
   Link as LinkIcon,
   AlignLeft,
@@ -92,7 +92,7 @@ export default function Home() {
                 </Link>
                 <button className="flex items-center gap-3 group">
                   <div className="w-12 h-12 rounded-full bg-[#Edf5f0] flex items-center justify-center group-hover:bg-[#c1e2d1] transition-colors text-[#046B46]">
-                    <PlayCircle className="w-5 h-5 fill-current" />
+                    <Play className="w-5 h-5 fill-current" />
                   </div>
                   <div className="text-left flex flex-col">
                     <span className="text-[15px] font-semibold text-slate-900 leading-tight">Watch Demo</span>

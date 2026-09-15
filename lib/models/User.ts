@@ -5,7 +5,7 @@ export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
-  password: string; // bcrypt hash
+  password?: string; // bcrypt hash for credentials, optional for OAuth
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,7 +14,7 @@ const UserSchema = new Schema<IUser>(
   {
     name:     { type: String, required: true, trim: true },
     email:    { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true },
+    password: { type: String, required: false },
   },
   { timestamps: true }
 );
