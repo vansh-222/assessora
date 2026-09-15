@@ -27,6 +27,7 @@ export const authConfig: NextAuthConfig = {
         const user = await User.findOne({ email: email.toLowerCase().trim() });
         if (!user) return null;
 
+        if (!user.password) return null; // OAuth user trying to login with password
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) return null;
 
@@ -48,21 +49,24 @@ export const authConfig: NextAuthConfig = {
         const existingUser = await User.findOne({ email: user.email?.toLowerCase().trim() });
         
         if (!existingUser) {
-          const newUser = await User.create({
+          await User.create({
             name: user.name,
             email: user.email?.toLowerCase().trim(),
           });
-          user.id = newUser._id.toString();
-        } else {
-          user.id = existingUser._id.toString();
         }
         return true;
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id;
+        if (account?.provider === 'google') {
+          await connectDB();
+          const dbUser = await User.findOne({ email: user.email?.toLowerCase().trim() });
+          token.id = dbUser?._id.toString() as string;
+        } else {
+          token.id = user.id;
+        }
         token.name = user.name;
         token.email = user.email;
       }
