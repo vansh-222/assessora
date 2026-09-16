@@ -445,22 +445,22 @@ export default function Home() {
               {/* Text & Pills */}
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-2.5">
-                  Transform Your Library Today
+                  Turn Learning Into Smarter Assessment
                 </h2>
                 <p className="text-emerald-50/90 text-[15px] mb-5 leading-relaxed max-w-2xl">
-                  Join colleges using Assessora to simplify library management and transform the way they handle books, students, and daily operations.
+                  Create structured assessments, practice smarter, and understand learning progress with Assessora — built for modern students and educators.
                 </p>
 
                 {/* Badges / Pills */}
                 <div className="flex flex-wrap gap-2.5">
                   <span className="bg-black/15 backdrop-blur-sm px-4 py-1.5 rounded-full text-[13px] font-medium text-emerald-50">
-                    1000+ Members
+                   Smart Assessments
                   </span>
                   <span className="bg-black/15 backdrop-blur-sm px-4 py-1.5 rounded-full text-[13px] font-medium text-emerald-50">
-                    Daily Updates
+                   Practice & Quizzes
                   </span>
                   <span className="bg-black/15 backdrop-blur-sm px-4 py-1.5 rounded-full text-[13px] font-medium text-emerald-50">
-                    Active Discussions
+                   Learning Insights
                   </span>
                 </div>
               </div>
